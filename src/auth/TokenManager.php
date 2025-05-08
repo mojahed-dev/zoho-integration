@@ -103,16 +103,16 @@ class TokenManager
     
         echo "Zoho Response: " . json_encode($result, JSON_PRETTY_PRINT) . "\n";
     
-        // if (isset($result['access_token'])) {
-        //     $this->accessToken = $result['access_token'];
+        if (isset($result['access_token'])) {
+            $this->accessToken = $result['access_token'];
     
-        //     file_put_contents($this->tokenFile, json_encode([
-        //         'access_token' => $this->accessToken,
-        //         'expires_at' => time() + 3500
-        //     ]));
-        // } else {
-        //     throw new \Exception("Failed to refresh token: " . json_encode($result));
-        // }
+            file_put_contents($this->tokenFile, json_encode([
+                'access_token' => $this->accessToken,
+                'expires_at' => time() + 3500
+            ]));
+        } else {
+            throw new \Exception("Failed to refresh token: " . json_encode($result));
+        }
     }
     
 
