@@ -3,6 +3,8 @@
 # Ignore environment variables
 .env
 
+credentials.json
+
 # Ignore Composer dependencies (optional if you're using GitHub & composer install later)
 vendor/
 

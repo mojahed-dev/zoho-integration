@@ -71,7 +71,6 @@ class TokenManager
     private function refreshAccessToken()
     {
         $url = $this->baseUrl . '/oauth/v2/token';
-        var_dump($url);
     
         $postFields = http_build_query([
             'refresh_token' => $this->refreshToken,
