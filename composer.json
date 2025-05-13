@@ -2,7 +2,8 @@
     "name": "theloadingscreen/zoho-automation-integration",
    "autoload": {
     "psr-4": {
-        "Auth\\": "src/auth/"
+        "Auth\\": "src/auth/",
+        "Api\\": "src/api/"
     }
 }
 ,
