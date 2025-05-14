@@ -68,51 +68,55 @@ class TokenManager
     //     }
     // }
 
-    private function refreshAccessToken()
-    {
-        $url = $this->baseUrl . '/oauth/v2/token';
-    
-        $postFields = http_build_query([
-            'refresh_token' => $this->refreshToken,
-            'client_id' => $this->clientId,
-            'client_secret' => $this->clientSecret,
-            'grant_type' => 'refresh_token',
-        ]);
-    
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/x-www-form-urlencoded',
-            'Accept: application/json'
-        ]);
-    
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    
-        if ($response === false || $httpCode !== 200) {
-            $error = curl_error($ch);
-            curl_close($ch);
-            throw new \Exception("HTTP request failed with code $httpCode: " . ($error ?: $response));
-        }
-    
+ private function refreshAccessToken()
+{
+    $url = $this->baseUrl . '/oauth/v2/token';
+
+    $postFields = http_build_query([
+        'refresh_token' => $this->refreshToken,
+        'client_id' => $this->clientId,
+        'client_secret' => $this->clientSecret,
+        'grant_type' => 'refresh_token',
+    ]);
+
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Content-Type: application/x-www-form-urlencoded',
+        'Accept: application/json'
+    ]);
+
+    // Secure fix for Windows: specify path to CA cert bundle
+    curl_setopt($ch, CURLOPT_CAINFO, __DIR__ . '/../certs/cacert.pem'); // Adjust path as needed
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+    if ($response === false || $httpCode !== 200) {
+        $error = curl_error($ch);
         curl_close($ch);
-        $result = json_decode($response, true);
-    
-        echo "Zoho Response: " . json_encode($result, JSON_PRETTY_PRINT) . "\n";
-    
-        if (isset($result['access_token'])) {
-            $this->accessToken = $result['access_token'];
-    
-            file_put_contents($this->tokenFile, json_encode([
-                'access_token' => $this->accessToken,
-                'expires_at' => time() + 3500
-            ]));
-        } else {
-            throw new \Exception("Failed to refresh token: " . json_encode($result));
-        }
+        throw new \Exception("HTTP request failed with code $httpCode: " . ($error ?: $response));
     }
+
+    curl_close($ch);
+    $result = json_decode($response, true);
+
+    echo "Zoho Response: " . json_encode($result, JSON_PRETTY_PRINT) . "\n";
+
+    if (isset($result['access_token'])) {
+        $this->accessToken = $result['access_token'];
+
+        file_put_contents($this->tokenFile, json_encode([
+            'access_token' => $this->accessToken,
+            'expires_at' => time() + 3500
+        ]));
+    } else {
+        throw new \Exception("Failed to refresh token: " . json_encode($result));
+    }
+}
+
     
 
 

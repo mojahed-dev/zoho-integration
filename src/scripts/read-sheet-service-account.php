@@ -7,6 +7,7 @@ use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\HandlerStack;
 use Google\Auth\Middleware\AuthTokenMiddleware;
 use Api\DeleteHandler;
+use Api\CreateHandler;
 
 $credentialsPath = __DIR__ . '/../../credentials.json';
 $spreadsheetId = '16toobLSIjNM5Hx-CFR0sACal_RurIvdTUJw9VN64XtE'; // Replace this with your actual Sheet ID
@@ -39,7 +40,9 @@ $dataResponse = $client->get("https://sheets.googleapis.com/v4/spreadsheets/$spr
 $data = json_decode((string) $dataResponse->getBody(), true);
 $rows = $data['values'] ?? [];
 
-$deleteHandler = new DeleteHandler(); // Make sure this is already working
+// $deleteHandler = new DeleteHandler(); // Make sure this is already working
+$createHandler = new CreateHandler();
+// var_dump($deleteHandler);
 
 // echo "🔍 Headers Detected from Sheet:\n";
 // foreach ($headers as $i => $header) {
@@ -110,6 +113,16 @@ foreach ($rows as $index => $row) {
     // }
    
     // echo "Row $index:\n";
+
+    if($action === 'add') {
+    echo "➕ Creating new customer...\n";
+    $createHandler->createCustomer([
+        'First Name' => $firstName,
+        'Last Name' => $lastName,
+        'EmailID' => $emailId,
+        // Add other fields
+    ]);
+}
     
         echo "🔹 Row $index: Customer ID = $customerId | Name = $firstName $lastName | Action = $action\n";
   
